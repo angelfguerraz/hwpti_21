@@ -28,4 +28,11 @@ end entity ArmDataReplication;
 architecture behave of ArmDataReplication is
 begin
 
+	case DRP_DMAS is
+		when "00" => DRP_OUTPUT <= (DRP_INPUT(7 downto 0), DRP_INPUT(7 downto 0), DRP_INPUT(7 downto 0), DRP_INPUT(7 downto 0)) --byte
+		when "10" => DRP_OUTPUT <= DRP_INPUT(15 downto 0) & DRP_INPUT(15 downto 0); -- hword
+		when "10" => DRP_OUTPUT <= DRP_INPUT;	--word
+		when "11" => DRP_OUTPUT <= DRP_INPUT;	--reserved
+	end case;
+	
 end architecture behave;
