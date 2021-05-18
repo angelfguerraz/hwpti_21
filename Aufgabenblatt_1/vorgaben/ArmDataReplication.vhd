@@ -20,6 +20,7 @@ use work.armtypes.all;
 
 entity ArmDataReplication is
 	port (	DRP_INPUT	: in	std_logic_vector(31 downto 0);
+			-- Data Memory Access Size
 		 	DRP_DMAS	: in	std_logic_vector(1 downto 0);
 		 	DRP_OUTPUT	: out	std_logic_vector(31 downto 0)
 	);
@@ -28,11 +29,16 @@ end entity ArmDataReplication;
 architecture behave of ArmDataReplication is
 begin
 
-	case DRP_DMAS is
-		when "00" => DRP_OUTPUT <= (DRP_INPUT(7 downto 0), DRP_INPUT(7 downto 0), DRP_INPUT(7 downto 0), DRP_INPUT(7 downto 0)) --byte
-		when "10" => DRP_OUTPUT <= DRP_INPUT(15 downto 0) & DRP_INPUT(15 downto 0); -- hword
-		when "10" => DRP_OUTPUT <= DRP_INPUT;	--word
-		when "11" => DRP_OUTPUT <= DRP_INPUT;	--reserved
-	end case;
+	with DRP_DMAS select
+	DRP_OUTPUT <= 
+	-- niederwertigen Byte wird ausgegeben 
+	((DRP_INPUT 7 downto 0) & DRP_INPUT(7 downto 0) & DRP_INPUT(7 downto 0)) & DRP_INPUT(7 downto 0)) when "00",
+	-- niederwertigen 16 Bits werden ausgegeben
+	(DRP_INPUT(15 downto 0) & DRP_INPUT(15 downto 0)) when "01",
+	-- Eingangs des Moduls wird unverändert am Ausgang ausgegeben.
+	DRP_IPUT when "10",
+	DRP_INPUT when "11",
+	"UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU" when others; 
+
 	
 end architecture behave;
